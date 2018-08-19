@@ -1,0 +1,32 @@
+{
+  "name": "im-invoice-fetch",
+  "version": "1.0.0",
+  "description": "Download invoices by month from instamojo",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "coverage": "nyc --reporter=html --reporter=text mocha",
+    "report": "nyc report --reporter=text"
+  },
+  "keywords": [
+    "instamojo",
+    "hanut",
+    "singh",
+    "gusain",
+    "insta",
+    "mojo",
+    "payments",
+    "payment",
+    "invoices"
+  ],
+  "author": "Hanut Singh Gusain <hanutsingh@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^1.7.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+    "nyc": "^12.0.2"
+  }
+}
