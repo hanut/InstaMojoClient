@@ -4,10 +4,10 @@
   "description": "Download invoices by month from instamojo",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --exit",
+    "test": "mocha --exit && npm run clean",
     "coverage": "nyc --reporter=html --reporter=text mocha",
     "report": "nyc report --reporter=text",
-    "clean": "rm .tmp/*.*"
+    "clean": "rm -f .tmp/*"
   },
   "keywords": [
     "instamojo",
