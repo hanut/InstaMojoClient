@@ -11,16 +11,12 @@ function checkDownloadStatus(filename) {
     try {
       let pathString = DOWNLOAD_PATH + filename;
       let fwatchTimeout = null;
-      fs.watchFile(pathString, (curr, prev) => {
-        // console.log(`the current is: ${curr}`);
-        // console.log(`the previous was: ${prev}`);
-        if(fwatchTimeout) {
-          clearTimeout(fwatchTimeout);
-        }
-        fwatchTimeout = setTimeout(function() {
-          clearTimeout(fwatchTimeout);
+      let fsWatcher = fs.watch(DOWNLOAD_PATH, (event, affectedFile) => {
+        // console.log(`the event is: ${event} | Filename : ${filename}`);
+        if(event === 'rename' && affectedFile === filename) {
+          fsWatcher.close();
           resolve(pathString);
-        }, 5000);
+        }
       });
     } catch (error) {
       reject(error);
@@ -45,21 +41,21 @@ const InvoiceClient = function(username, password) {
     if(month === '') {
       throw new Error('Month is a required parameter');
     }
+    const browser = await puppeteer.launch({dumpio: false, headless: true});
+    // console.log(await browser.version() + ' started');
+    const page = await browser.newPage();
+    await page._client.send('Page.setDownloadBehavior', {behavior: 'allow', downloadPath: DOWNLOAD_PATH})
     try {
-      const browser = await puppeteer.launch({dumpio: false, headless: true});
-      // console.log(await browser.version() + ' started');
-      const page = await browser.newPage();
-      await page._client.send('Page.setDownloadBehavior', {behavior: 'allow', downloadPath: DOWNLOAD_PATH})
       await page.goto('https://www.instamojo.com');
       // console.log('page loaded....click login')
       await page.click('.js-login-trigger');
       // console.log('clicked login');
       await page.$eval('#id_login_username', (ele, username) => {
         ele.value = username;
-      }, username);
+      }, this.username);
       await page.$eval('#id_login_password', (ele, password) => {
         ele.value = password;
-      }, password);
+      }, this.password);
       // console.log('login form populated');
       let navPromise = page.waitForNavigation();
       await page.$eval('#loginForm #submit', (ele) => ele.click());
@@ -109,13 +105,14 @@ const InvoiceClient = function(username, password) {
       // console.log(result);
       let reportPath = await checkDownloadStatus(result);
       await browser.close();
+      // console.log('Browser closed');
       return reportPath;
     } catch(error) {
-      // console.log(error);
+      console.log(error);
       await browser.close();
       throw error;
     }
   }
 }
 
-module.exports = InvoiceClient;
+module.exports = function(username, password) {return new InvoiceClient(username, password)};

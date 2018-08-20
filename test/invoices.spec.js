@@ -7,12 +7,17 @@ describe('Invoices Module', function() {
 
   describe('Integrity Check', function() {
 
-    it('should export a function', function() {
-      expect(testModule).is.an('object')
+    before(() => {
+      invoiceClient = testModule(USERNAME, PASSWORD);
     })
 
-    it('should contain a download method', function() {
-      expect(testModule.download).is.a('function')
+    it('should export a function', function() {
+      expect(testModule).is.an('function')
+    })
+
+    it('exported function should return an object with a download method', function() {
+      expect(invoiceClient).is.an('object');
+      expect(invoiceClient.download).is.a('function');
     })
 
   })
@@ -21,7 +26,7 @@ describe('Invoices Module', function() {
 
     it('should download the report file for a valid month+year', function(done) {
       this.timeout(30000)
-      testModule.download(2017, 6, USERNAME, PASSWORD).then(response => {
+      invoiceClient.download(2017, 6, USERNAME, PASSWORD).then(response => {
         console.log(response)
         done()
       }).catch(error => {
